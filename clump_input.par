@@ -1,0 +1,354 @@
+# test input parameter file for the clumps
+# best parameters for flux and size when
+#    image plane pixel value = source plane pixel value
+deflect     ../dplx2.fits ../dply2.fits
+ps          0.03
+rms         6.49
+kernel      1.38
+data        ../606clumps+noise.fits
+aperture    ../aperture.fits
+offset      778 1882  
+resolution  10
+clump 0
+    x_im    1299.88
+    y_im    3034.24
+    flux    200
+    size    0.12
+    e       0
+    pa      0
+    end
+limit 0
+    flux    1 50 400
+    size    1 0.10 0.15
+    e       0 0.3  0.90
+    pa      0 80   150
+    end
+clump 1
+    x_im    1293.64
+    y_im    3015.40
+    flux    190
+    size    0.12
+    end
+limit 1
+    flux    1 130 250
+    size    1 0.10 0.15
+    end
+clump 2
+    x_im    1290.22
+    y_im    2994.17
+    flux    120
+    size    0.13
+    e       0.0
+    pa      0
+    end
+limit 2
+    flux    1 90 150
+    size    1 0.10 0.18
+    e       0 0.2  0.8
+    pa      0 60   150
+    end
+clump 3
+    x_im    1293.73
+    y_im    2961.26
+    flux    600
+    size    0.12
+    e       0
+    pa      0
+    end
+limit 3
+    flux    1 200 1000
+    size    1 0.10 0.16
+    e       0 0.0 0.8
+    pa      0 -90 90
+   end
+clump 4
+    x_im    1294.57
+    y_im    2942.85
+    flux    110 
+    size    0.12
+    end
+limit 4
+    flux    1 90 150
+    size    1 0.10 0.15
+    end
+clump 5
+    x_im    1292.08
+    y_im    2926.96
+    flux    350
+    size    0.12
+    e       0
+    pa      0
+    end
+limit 5
+    flux    1 100 500
+    size    1 0.1 0.15
+    e       0 0.0 0.6
+    pa      0 90 170
+    end
+clump 6
+    x_im    1290.73
+    y_im    2905.41
+    flux    80
+    size    0.12
+    e       0.0
+    pa      0
+    end
+limit 6
+    flux    1 40 120
+    size    1 0.10 0.15
+    e       0 0.0 0.8
+    pa      0 -90 90
+    end
+clump 7
+    x_im    1295.68
+    y_im    2979.38
+    flux    500
+    size    0.11
+    e       0.
+    pa      0
+    end
+limit 7
+    flux    1 200 800
+    size    1 0.10 0.15
+    e       0 0.3  0.7
+    pa      0 60   140
+    end
+clump 8
+    x_im    1294.81
+    y_im    2990.44
+    flux    400
+    size    0.11
+    e       0
+    pa      0
+    end
+limit 8
+    flux    1 200 700
+    size    1 0.10 0.15
+    e       0 0.2  0.90
+    pa      0 60    160
+    end
+clump 9
+    x_im    1299.12
+    y_im    2999.44
+    flux    110
+    size    0.13
+    e       0
+    pa      0
+    end
+limit 9
+    flux    1 60 150
+    size    1 0.10 0.16
+    e       0 0    0.90
+    pa      0 0    180
+    end
+clump 10
+    x_im    1297.41
+    y_im    3007.04
+    flux    60
+    size    0.17
+    end
+limit 10
+    flux    1 10 100
+    size    1 0.10 0.20
+    end
+clump 11
+    x_im    1302.2
+    y_im    3009.25
+    flux    50
+    size    0.15
+    end
+limit 11
+    flux    1 25 80
+    size    1 0.11 0.19
+    end
+clump 12
+    x_im    1305.50
+    y_im    3020.86
+    flux    200
+    size    0.11
+    e       0
+    pa      0
+    end
+limit 12
+    flux    1 50 400
+    size    1 0.10 0.15
+    e       0 0.2  0.95
+    pa      0 20   100
+    end
+clump 13
+    x_im    1300.47
+    y_im    3022.37
+    flux    60
+    size    0.15
+    end
+limit 13
+    flux    1 40 100
+    size    1 0.10 0.18
+    end
+clump 14
+    x_im    1298.76
+    y_im    2994.37
+    flux    90
+    size    0.14
+    e       0
+    pa      0
+    end
+limit 14
+    flux    1 60 150
+    size    1 0.10 0.17
+    e       0 0.2  0.70
+    pa      0 80    160
+    end
+clump 15
+    x_im    1299.97
+    y_im    2991.37
+    flux    250
+    size    0.11
+    e       0
+    pa      0
+    end
+limit 15
+    flux    1 50 400
+    size    1 0.10 0.15
+    e       0 0.5  0.90
+    pa      0 30    150
+    end
+clump 16
+    x_im    1294.88
+    y_im    2970.60
+    flux    50
+    size    0.15
+    end
+limit 16
+    flux    1 20 60
+    size    1 0.10 0.25
+    end
+clump 17
+    x_im    1294.84
+    y_im    2985.40
+    flux    150
+    size    0.14
+    e       0
+    pa      0
+    end
+limit 17
+    flux    1 50 250
+    size    1 0.10 0.25
+    e       0 0.0  0.70
+    pa      0 0    180
+    end
+clump 18
+    x_im    1298.06
+    y_im    2962.92
+    flux    30
+    size    0.19
+    end
+limit 18
+    flux     1 10 60
+    size     1 0.11 0.20
+    end
+clump 19
+    x_im    1306.97
+    y_im    3046.18
+    flux    70
+    size    0.13
+    e       0
+    pa      0
+    end
+limit 19
+    flux    1 30 80
+    size    1 0.10 0.15
+    e       0 0.3  0.85
+    pa      0 20    120
+    end
+clump 20
+    x_im    1308.90
+    y_im    3057.58
+    flux    60
+    size    0.15
+    e       0
+    pa      0
+    end
+limit 20
+    flux    1 40 150
+    size    1 0.10 0.20
+    e       0 0.1  0.70
+    pa      0 40    140
+    end
+clump 21
+    x_im    1310.30
+    y_im    3061.39
+    flux    130
+    size    0.11
+    e       0
+    pa      0
+    end
+limit 21
+    flux    1 70 200
+    size    1 0.10 0.14
+    e       0 0.0  0.80
+    pa      0 40    170
+    end
+clump 22
+    x_im    1307.98
+    y_im    3051.83
+    flux    50
+    size    0.15
+    e       0
+    pa      0
+    end
+limit 22
+    flux    1 20  70
+    size    1 0.12 0.22
+    e       0 0.3  0.90
+    pa      0 40    150
+    end
+clump 23
+    x_im    1288.95
+    y_im    3016.04
+    flux    20
+    size    0.11
+    end
+limit 23
+    flux    1 5 70
+    size    1 0.10 0.15
+    end
+clump 24
+    x_im    1304.23
+    y_im    3033.20
+    flux    40
+    size    0.14
+    end
+limit 24
+    flux    1 20 60
+    size    1 0.12 0.18
+    end
+clump 25
+    x_im    1298.53
+    y_im    2938.02
+    flux    20
+    size    0.16
+    e       0
+    pa      0
+    end
+limit 25
+    flux    1 5 60
+    size    1 0.12 0.20
+    e       0 0.3 0.8
+    pa      0 130 170
+    end
+clump 26
+    x_im    1303.51
+    y_im    3054.87
+    flux    50
+    size    0.11
+    e       0
+    pa      0
+    end
+limit 26
+    flux    1 30 120
+    size    1 0.10 0.15
+    e       0 0.3  0.80
+    pa      0 70    160
+    end
+
