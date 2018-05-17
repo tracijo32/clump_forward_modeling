@@ -1,4 +1,4 @@
-# date: 05/19/2016
+# date: 04/18/2018
 # author: Traci Johnson
 # Solves for the sizes of the clumps in the source plane by ray tracing
 # a source plane model of clumps to image plane, convolving with instrument
@@ -14,6 +14,9 @@
 #   - y position
 # any combination of those parameters can be set fixed or free for any clump
 
+# update 1/2018:
+# have added a way to create a sersic profile for smooth components
+
 ###########################
 ## IMPORT external modules
 ###########################
@@ -21,6 +24,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.convolution import Gaussian2DKernel,convolve_fft
+from astropy.modeling.functional_models import Gaussian2D,Sersic2D
 from scipy import interpolate,sparse
 import emcee
 import pickle
@@ -110,7 +114,7 @@ def select_source_grid(dims,resolution=10):
 
     return xx,yy
 
-def gaussian2d(xx,yy,x0,y0,amp,width,e,pa):
+def orig_gaussian2d(xx,yy,x0,y0,amp,width,e,pa):
     # creates a 1d gaussian (w/ ellipticity and pa) given the 
     # mesharrays xx and yy with the x and y values of the 2d array
     xp = (xx-x0)*np.cos(pa*np.pi/180)-(yy-y0)*np.sin(pa*np.pi/180)
@@ -120,12 +124,34 @@ def gaussian2d(xx,yy,x0,y0,amp,width,e,pa):
     U = (xp/sigxp)**2+(yp/sigyp)**2
     return amp*np.exp(-U/2)
 
+def gaussian2d(xx,yy,x0,y0,amp,width,e,pa):
+    # creates a 2d gaussian (w/ ellipticity and pa) given the 
+    # mesharrays xx and yy with the x and y values of the 2d array
+    sigxp = width
+    sigyp = width*np.sqrt((1-e)/(1+e))
+    model = Gaussian2D(amplitude=amp, x_mean=x0, y_mean=y0, x_stddev=sigxp, 
+                        y_stddev=sigyp, theta=np.pi*pa/180)
+    return model(xx,yy)
+
+def sersic2d(xx,yy,x0,y0,peak,reff,e,pa,n):
+    # creates a 2d sersic profile, I = A*exp[-k*R**0.25]
+    from scipy.special import gammaincinv
+    bn = gammaincinv(2*n,0.5)
+    amp = peak/np.exp(bn)
+    
+    model = Sersic2D(amplitude = amp, r_eff = reff, n=n, x_0=x0, y_0=y0,
+               ellip=e, theta=np.pi*pa/180)#theta=np.pi*float(pa)/180)
+    return model(xx,yy)
+
 def mag2flux(m,mag0=20.0):
     return 10**(0.4*(mag0-m))
 
-def model_clumps(xas,yas,x0,y0,flux,size,e,pa,ps_s=None):
+def model_clumps(xas,yas,x0,y0,flux,size,e,pa,n,ps_s=None,profile=None):
     # creates a model clumps brightness on a fine resolution source plane grid
     nclumps = len(x0)
+    if profile is None:
+        profile = ['gaussian']*nclumps
+    
 
     # find range for an image with better resolution, as specified
     rx = (xas[1]-xas[0])/ps_s
@@ -140,7 +166,10 @@ def model_clumps(xas,yas,x0,y0,flux,size,e,pa,ps_s=None):
     # superpose each gaussian onto the flux array
     f = xx*0
     for i in range(nclumps):
-        f = f+gaussian2d(xx,yy,x0[i],y0[i],flux[i]*ps_s**2,size[i],e[i],pa[i])
+        if profile[i] == 'gaussian':
+            f = f+gaussian2d(xx,yy,x0[i],y0[i],flux[i]*ps_s**2,size[i],e[i],pa[i])
+        else:
+            f = f+sersic2d(xx,yy,x0[i],y0[i],flux[i]*ps_s**2,size[i],e[i],pa[i],n[i])
     return f
 
 def raytrace(f,xx,yy,deflectx,deflecty,dlsds=1,dx=0,dy=0,thresh_dis=0.1,thresh_val=0.001):
@@ -355,8 +384,8 @@ def drizzle_matrix(alpha_x,alpha_y,xa,ya,xas,yas,dx=0,dy=0,ps_s=0.1):
     ys_c = ymat_c + 1 - alpha_y_c
 
     ## simple delensing of image plane pixel centers to source plane
-    xs = xmat + 1 - alpha_x[ya[0]:ya[1],xa[0]:xa[1]]
-    ys = ymat + 1 - alpha_y[ya[0]:ya[1],xa[0]:xa[1]]
+    xs = xmat + 1 - alpha_x[int(ya[0]):int(ya[1]),int(xa[0]):int(xa[1])]
+    ys = ymat + 1 - alpha_y[int(ya[0]):int(ya[1]),int(xa[0]):int(xa[1])]
  
     buff = 0
     xvec_s = np.arange(xas[0]-buff,xas[1]+buff,ps_s)
@@ -442,7 +471,11 @@ def fo_drizzle(source,a,xa,ya,ps_s=0.1):
 
 
 
-def logProb_image_drz(x,data=None,aperture=None,params=None,fixfree=None,xa=None,ya=None,xas=None,yas=None,dx=None,dy=None,rms=None,psf=None,deflectx=None,deflecty=None,priors=None,ps_s=None,a=None):
+def logProb_image_drz(x,data=None,aperture=None,params=None,fixfree=None,
+                        xa=None,ya=None,xas=None,yas=None,dx=None,dy=None,
+                        rms=None,psf=None,deflectx=None,deflecty=None,
+                        priors=None,ps_s=None,a=None,profile=None):
+
     ## computes the posterior probability at the location in parameter space specified by the vector x
     ## function called by emcee
     ## can be modified to return 'arbitrary metadata blobs' by stating 'blobs=True'
@@ -459,6 +492,7 @@ def logProb_image_drz(x,data=None,aperture=None,params=None,fixfree=None,xa=None
     size = params[:,3]
     e = params[:,4]
     pa = params[:,5]
+    n = params[:,6]
 
     ## insert priors here
     logPrior = 0
@@ -470,18 +504,18 @@ def logProb_image_drz(x,data=None,aperture=None,params=None,fixfree=None,xa=None
                 logPrior += (params[i,j]-priors[i,j,0])**2/(2*priors[i,j,1]**2) 
 
     ## create source plane model based on the free parameter selection for this walker
-    source_model = model_clumps(xas,yas,x0,y0,f,size,e,pa,ps_s=ps_s)
+    source_model = model_clumps(xas,yas,x0,y0,f,size,e,pa,n,ps_s=ps_s,profile=profile)
     
     ## ray trace the source plane model to image plane
     #image_model = raytrace(source_model,xx,yy,deflectx,deflecty,dx=dx,dy=dy)
     image_model = fo_drizzle(source_model,a,xa,ya,ps_s=ps_s)
 
-    ## convolve the model
-    image_model_conv = convolve_fft(image_model,psf)
-
     ## crop data
     data *= aperture
     data = data[ya[0]:ya[1],xa[0]:xa[1]]
+
+    ## convolve the model
+    image_model_conv = convolve_fft(image_model,psf)
  
     ## compute log likelihood and log probability
     res = image_model_conv-data
@@ -498,7 +532,9 @@ def logProb_image_drz(x,data=None,aperture=None,params=None,fixfree=None,xa=None
 
     return logProb
 
-def logProb_image(x,data=None,mask=None,params=None,fixfree=None,xx=None,yy=None,dx=None,dy=None,rms=None,psf=None,deflectx=None,deflecty=None,results=None,progress=None,blobs=False,priors=None,aperture=None):
+def logProb_image(x,data=None,mask=None,params=None,fixfree=None,
+    xx=None,yy=None,dx=None,dy=None,rms=None,psf=None,deflectx=None,deflecty=None,
+    results=None,progress=None,blobs=False,priors=None,aperture=None):
     ## computes the posterior probability at the location in paramter space specified by the vector x
     ## function called by emcee
     ## can be modified to return 'arbitrary metadata blobs' by stating 'blobs=True'
@@ -571,7 +607,8 @@ def logProb_image(x,data=None,mask=None,params=None,fixfree=None,xx=None,yy=None
     else:
         return logProb
 
-def createOutputs_drz(params,str='',data=None,xa=None,ya=None,xas=None,yas=None,dx=None,dy=None,psf=None,a=None,ps_s=None):
+def createOutputs_drz(params,str='',data=None,xa=None,ya=None,xas=None,yas=None,
+        dx=None,dy=None,psf=None,a=None,ps_s=None,profile=None):
     ## creates the fits files outputs given the parameter array
     ## outputs include:
     ## -- source plane model
@@ -586,25 +623,30 @@ def createOutputs_drz(params,str='',data=None,xa=None,ya=None,xas=None,yas=None,
     size = params[:,3]
     e = params[:,4]
     pa = params[:,5]
+    n = params[:,6]
 
-    source_model = model_clumps(xas,yas,x0,y0,f,size,e,pa,ps_s=ps_s)
-    fits.writeto('source'+str+'.fits',source_model,clobber=True)    
+    source_model = model_clumps(xas,yas,x0,y0,f,size,e,pa,n,ps_s=ps_s,profile=profile)
+    fits.writeto('source'+str+'.fits',source_model,overwrite=True)    
+
+    print a.shape
+    print source_model.shape
 
     image_model = fo_drizzle(source_model,a,xa,ya,ps_s=ps_s)
 
     data = data[ya[0]:ya[1],xa[0]:xa[1]]
 
-    fits.writeto('image'+str+'.fits',image_model,clobber=True)
-    fits.writeto('data'+str+'.fits',data,clobber=True)
+    fits.writeto('image'+str+'.fits',image_model,overwrite=True)
+    fits.writeto('data'+str+'.fits',data,overwrite=True)
 
     ## convolve the model
     image_model_conv = convolve_fft(image_model,psf)
-    fits.writeto('image_convolve'+str+'.fits',image_model_conv,clobber=True)
+    fits.writeto('image_convolve'+str+'.fits',image_model_conv,overwrite=True)
 
     res = image_model_conv-data
-    fits.writeto('residual'+str+'.fits',res,clobber=True)
+    fits.writeto('residual'+str+'.fits',res,overwrite=True)
 
-def createOutputs(params,str='',data=None,mask=None,xx=None,yy=None,dx=None,dy=None,psf=None,deflectx=None,deflecty=None):
+def createOutputs(params,str='',data=None,mask=None,xx=None,yy=None,dx=None,dy=None,
+        psf=None,deflectx=None,deflecty=None,profile=None):
     ## creates the fits files outputs given the parameter array
     ## outputs include:
     ## -- source plane model
@@ -620,23 +662,23 @@ def createOutputs(params,str='',data=None,mask=None,xx=None,yy=None,dx=None,dy=N
     e = params[:,4]
     pa = params[:,5]
 
-    source_model = model_clumps(xx,yy,x0,y0,f,size,e,pa)
-    fits.writeto('source'+str+'.fits',source_model,clobber=True)    
+    source_model = model_clumps(xx,yy,x0,y0,f,size,e,pa,profile=profile)
+    fits.writeto('source'+str+'.fits',source_model,overwrite=True)    
 
     image_model = raytrace(source_model,xx,yy,deflectx,deflecty,dx=dx,dy=dy)
 
     image_model = image_model[mask[2]-dy:mask[3]-dy,mask[0]-dx:mask[1]-dx]
     data = data[mask[2]:mask[3],mask[0]:mask[1]]
 
-    fits.writeto('image'+str+'.fits',image_model,clobber=True)
-    fits.writeto('data'+str+'.fits',data,clobber=True)
+    fits.writeto('image'+str+'.fits',image_model,overwrite=True)
+    fits.writeto('data'+str+'.fits',data,overwrite=True)
 
     ## convolve the model
     image_model_conv = convolve_fft(image_model,psf)
-    fits.writeto('image_convolve'+str+'.fits',image_model_conv,clobber=True)
+    fits.writeto('image_convolve'+str+'.fits',image_model_conv,overwrite=True)
 
     res = image_model_conv-data
-    fits.writeto('residual'+str+'.fits',res,clobber=True)
+    fits.writeto('residual'+str+'.fits',res,overwrite=True)
  
 #####################################
 # scripts for loading inputs to model   
@@ -648,11 +690,13 @@ class Inputs:
         f.close()
 
         index = np.zeros(100)
-        params = np.zeros((100,6))
-        fixfree = np.zeros((100,6))
-        priors = np.zeros((100,6,2))
+        params = np.zeros((100,7))
+        fixfree = np.zeros((100,7))
+        priors = np.zeros((100,7,2))
+        profile = []
 
-        par_list = {'x_im':0,'y_im':1,'flux':2,'size':3,'e':4,'pa':5}
+        par_list = {'x_im':0,'y_im':1,'flux':2,'size':3,'e':4,'pa':5,
+                    'x':0, 'y':1, 'n':6}
 
         i = 0
         j = 0
@@ -684,7 +728,10 @@ class Inputs:
                 i += 1
                 ls = lines[i].rsplit()
                 while ls[0] != 'end':
-                    params[j,par_list[ls[0]]] = ls[1]
+                    if ls[0] == 'profile':
+                        profile.append(ls[1])
+                    else:
+                        params[j,par_list[ls[0]]] = ls[1]
                     i += 1
                     ls = lines[i].rsplit()
                 i+=2
@@ -703,6 +750,11 @@ class Inputs:
         self.priors = priors[:j,:,:]
 
         self.nclumps = j
+
+        if len(profile) == 0:
+            self.profile = ['gaussian']*j
+        else:
+            self.profile = profile
 #################################
 # plotting scripts
 #################################
@@ -767,6 +819,3 @@ def cornerplot(flatchain,flatlnprobability,params=np.array([]),labels=None,chi2=
     axarr[0,0].yaxis.set_visible(False)
 
     plt.show()
-
-
-

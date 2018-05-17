@@ -1,0 +1,256 @@
+deflect     dplx2.fits dply2.fits
+ps          0.03
+rms         6.49
+kernel      1.38
+data        606.fits
+aperture    aperture.fits
+offset      778 1882
+resolution  10
+img_crop    1270 1340 2883 3080
+src_crop    auto
+clump 1
+    profile sersic
+    x    1574.956
+    y    2998.250
+    flux 0.015
+    size 2.529
+    e    0.356
+    pa   169.547
+    n    2.029
+    end
+limit 1
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 2
+    profile sersic
+    x    1575.933
+    y    3002.021
+    flux 0.026
+    size 0.745
+    n    0.923
+    end
+limit 2
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 3
+    profile sersic
+    x    1577.359
+    y    3007.648
+    flux 0.019
+    size 1.175
+    e    0.359
+    pa   3.797
+    n    1.418
+    end
+limit 3
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 4
+    profile sersic
+    x    1573.470
+    y    2996.082
+    flux 0.011
+    size 0.742
+    n    0.720
+    end
+limit 4
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 5
+    profile sersic
+    x    1575.477
+    y    2999.715
+    flux 0.008
+    size 5.971
+    e    0.824
+    pa   75.203
+    n    0.655
+    end
+limit 5
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 6
+    profile sersic
+    x    1569.428
+    y    2986.618
+    flux 0.007
+    size 1.764
+    e    0.489
+    pa   159.166
+    n    1.573
+    end
+limit 6
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 7
+    profile sersic
+    x    1569.893
+    y    2991.180
+    flux 0.004
+    size 0.743
+    n    0.905
+    end
+limit 7
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 8
+    profile sersic
+    x    1573.125
+    y    2988.457
+    flux 0.006
+    size 1.594
+    e    0.585
+    pa   167.875
+    n    1.467
+    end
+limit 8
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 9
+    profile sersic
+    x    1569.360
+    y    2980.805
+    flux 0.002
+    size 11.834
+    e    0.795
+    pa   150.604
+    n    1.897
+    end
+limit 9
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 10
+    profile sersic
+    x    1569.470
+    y    2981.707
+    flux 0.002
+    size 15.000
+    e    0.872
+    pa   72.362
+    n    1.024
+    end
+limit 10
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 11
+    profile sersic
+    x    1573.758
+    y    2993.762
+    flux 0.005
+    size 0.725
+    n    0.753
+    end
+limit 11
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 12
+    profile sersic
+    x    1571.525
+    y    2995.832
+    flux 0.005
+    size 0.942
+    n    1.234
+    end
+limit 12
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 13
+    profile sersic
+    x    1575.089
+    y    2995.351
+    flux 0.007
+    size 0.705
+    n    0.735
+    end
+limit 13
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 14
+    profile sersic
+    x    1574.146
+    y    2994.851
+    flux 0.005
+    size 0.887
+    n    0.500
+    end
+limit 14
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 15
+    profile sersic
+    x    1573.756
+    y    2991.169
+    flux 0.002
+    size 0.400
+    n    0.500
+    end
+limit 15
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 16
+    profile sersic
+    x    1572.354
+    y    2992.458
+    flux 0.004
+    size 15.000
+    e    0.238
+    pa   109.887
+    n    3.457
+    end
+limit 16
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 17
+    profile sersic
+    x    1577.202
+    y    3001.249
+    flux 0.005
+    size 3.531
+    e    0.507
+    pa   16.081
+    n    2.420
+    end
+limit 17
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 18
+    profile sersic
+    x    1577.389
+    y    3005.263
+    flux 0.004
+    size 0.602
+    n    0.758
+    end
+limit 18
+    flux 1 0 1
+    size 1 0 1
+    end
+clump 19
+    profile sersic
+    x    1573.990
+    y    2997.102
+    flux 0.007
+    size 0.981
+    n    0.739
+    end
+limit 19
+    flux 1 0 1
+    size 1 0 1
+    end

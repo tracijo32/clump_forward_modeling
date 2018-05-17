@@ -1,12 +1,12 @@
 # test input parameter file for the clumps
 # best parameters for flux and size when
 #    image plane pixel value = source plane pixel value
-deflect     ../dplx2.fits ../dply2.fits
+deflect     dplx2.fits dply2.fits
 ps          0.03
 rms         6.49
 kernel      1.38
-data        ../606clumps+noise.fits
-aperture    ../aperture.fits
+data        606clumps+noise.fits
+aperture    aperture.fits
 offset      778 1882  
 resolution  10
 clump 0

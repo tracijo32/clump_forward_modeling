@@ -5,7 +5,7 @@ from clump_forward_modeling import *
 ####################################
 if __name__ == '__main__':
     ## load the input file
-    inputs = Inputs(file='clump_input.par')
+    inputs = Inputs(file='new_clump_input.par')
     nclumps = inputs.nclumps
     dx = inputs.dx
     dy = inputs.dy
@@ -21,15 +21,14 @@ if __name__ == '__main__':
 
     ## find sou:qrce plane locations of clumps
     params = inputs.params
+    #params[:,3] *= 0.5
 
-    ## create a mask for the cropped region of the image, covering only where we want the clumps
-    ixmin = np.floor(np.amin(params[:,0]))-10
-    ixmax = np.floor(np.amax(params[:,0]))+11
-    iymin = np.floor(np.amin(params[:,1]))-10
-    iymax = np.floor(np.amax(params[:,1]))+11
-
-    ## find clump positions in the source plane
-    params[:,0],params[:,1] = delens(params[:,0],params[:,1],deflectx,deflecty,dx=dx,dy=dy)
+    ## create a mask for the cropped region of the image, 
+    ## covering only where we want the clumps
+    ixmin = 1270
+    ixmax = 1340
+    iymin = 2883
+    iymax = 3080
 
     ## select region of the source plane to place the grid 
     xmin = np.floor(np.amin(params[:,0]))-2
@@ -39,11 +38,7 @@ if __name__ == '__main__':
 
     ## create fixed/free array: if the parameter is free, then set value equal to 1
     fixfree = inputs.fixfree
-    ## or select your own parameters to set free
-    #fixfree = params*0
-    #fixfree[5,2:] += 1
 
-    ## set the bounds for the priors: all assumed to be uniform random distributions
     priors = inputs.priors
 
     xa = np.array([ixmin,ixmax]).astype(int)
@@ -55,8 +50,9 @@ if __name__ == '__main__':
     psf = Gaussian2DKernel(inputs.kernel)
 
     data = fits.getdata(inputs.data)
-    #aperture = fits.getdata(inputs.aperture)
-    aperture = np.ones(data.shape)
+    aperture = fits.getdata(inputs.aperture)
+    #aperture = np.ones(data.shape)
+    profile = inputs.profile
 
     import os
     if os.path.exists('amat.p'):
@@ -66,8 +62,8 @@ if __name__ == '__main__':
     if a.shape[0] != (xmax-xmin)*(ymax-ymin)/ps_s and a.shape[1] != (ixmax-ixmin)*(iymax-iymin):
         a = drizzle_matrix(deflectx,deflecty,xa,ya,xas,yas,ps_s=ps_s,dx=dx,dy=dy)
         pickle.dump(a,open('amat.p','wb'))
-    
-    if 1:
+
+    if 0:
         ## set up # of walkers and # of free parameters
         ndim = int(np.sum(fixfree > 0))
         nwalkers = ndim*10
@@ -76,9 +72,9 @@ if __name__ == '__main__':
         inits = []
         for n in range(nwalkers):
             x = []
-            walker = np.zeros((nclumps,7))
+            walker = np.zeros((nclumps,6))
             for i in range(nclumps):
-                for j in range(7):
+                for j in range(6):
                     if fixfree[i,j] == 1:
                         walker[i,j] = np.random.uniform(low=priors[i,j,0],high=priors[i,j,1],size=1)
                     if fixfree[i,j] == 2:
@@ -116,8 +112,7 @@ if __name__ == '__main__':
                     "psf":psf,
                     "deflectx":deflectx,
                     "deflecty":deflecty,
-                    "aperture":aperture,
-                    "profile":profile
+                    "aperture":aperture
                     }
     
         ## initiate the sampler
@@ -168,8 +163,11 @@ if __name__ == '__main__':
         #pickle.dump(sampler.acceptance_fraction,open('acceptance_fraction.p','rb'))
         print 'done.'
     else:
-        createOutputs_drz(params,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,psf=psf,a=a,ps_s=ps_s)
+        createOutputs_drz(params,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,
+            psf=psf,a=a,ps_s=ps_s,profile=profile)
         #x = makeParVector(params,fixfree)
         #print x
         #print logProb_image_drz(x,data=data,aperture=aperture,params=params,fixfree=fixfree,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,rms=rms,psf=psf,deflectx=deflectx,deflecty=deflecty,priors=priors,ps_s=ps_s,a=a)
         
+
+    
