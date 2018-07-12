@@ -628,8 +628,8 @@ def createOutputs_drz(params,str='',data=None,xa=None,ya=None,xas=None,yas=None,
     source_model = model_clumps(xas,yas,x0,y0,f,size,e,pa,n,ps_s=ps_s,profile=profile)
     fits.writeto('source'+str+'.fits',source_model,overwrite=True)    
 
-    print a.shape
-    print source_model.shape
+    #print a.shape
+    #print source_model.shape
 
     image_model = fo_drizzle(source_model,a,xa,ya,ps_s=ps_s)
 
@@ -710,6 +710,8 @@ class Inputs:
                 i+=1
                 continue
             ## load setup parameters
+            if ls[0] == 'img_crop':
+                self.img_crop = np.array(ls[1:5]).astype(int)
             if ls[0] == 'deflect':
                 self.deflectx = ls[1]
                 self.deflecty = ls[2]
@@ -767,7 +769,7 @@ def plotWalker(chain,param):
 def getLabels(params,fixfree,index):
     ## returns array of strings for labeling the plots in cornerplot()
     index_arr = np.array([index,]*params.shape[1]).transpose().astype('str')
-    names_arr = np.array([['x','y','flux','size','e','pa'],]*params.shape[0])
+    names_arr = np.array([['x','y','flux','size','e','pa','n'],]*params.shape[0])
     labels = []
     for i in range(params.size):
         if fixfree.flat[i] > 0:
