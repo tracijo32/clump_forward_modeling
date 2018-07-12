@@ -25,10 +25,15 @@ if __name__ == '__main__':
 
     ## create a mask for the cropped region of the image, 
     ## covering only where we want the clumps
-    ixmin = 1270
-    ixmax = 1340
-    iymin = 2883
-    iymax = 3080
+    #ixmin = 1270
+    #ixmax = 1340
+    #iymin = 2883
+    #iymax = 3080
+    ixmin = inputs.img_crop[0]
+    ixmax = inputs.img_crop[1]
+    iymin = inputs.img_crop[2]
+    iymax = inputs.img_crop[3]
+
 
     ## select region of the source plane to place the grid 
     xmin = np.floor(np.amin(params[:,0]))-2
@@ -63,7 +68,7 @@ if __name__ == '__main__':
         a = drizzle_matrix(deflectx,deflecty,xa,ya,xas,yas,ps_s=ps_s,dx=dx,dy=dy)
         pickle.dump(a,open('amat.p','wb'))
 
-    if 0:
+    if 1:
         ## set up # of walkers and # of free parameters
         ndim = int(np.sum(fixfree > 0))
         nwalkers = ndim*10
@@ -87,7 +92,8 @@ if __name__ == '__main__':
 
         #print logProb_image_drz(inits[0],data=data,params=params,fixfree=fixfree,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,rms=rms,psf=psf,deflectx=deflectx,deflecty=deflecty,priors=priors,ps_s=ps_s,a=a)
 
-        ## get labels of the free parameters   
+        ## get labels of the free parameters 
+        print params.shape, fixfree.shape  
         labels = getLabels(params,fixfree,inputs.index)
         print labels
         ## create a blank file to write results, keep track of progress
@@ -116,13 +122,13 @@ if __name__ == '__main__':
                     }
     
         ## initiate the sampler
-        nthreads=8
+        nthreads=2
         print str(datetime.now())
         print 'initiating MCMC ensemble sampler ({2:d} threads) with {0:d} walkers {1:d} free parameters'.format(nwalkers, ndim, nthreads)
         sampler = emcee.EnsembleSampler(nwalkers, ndim, logProb_image_drz, kwargs=fit_args, threads=nthreads)
     
         ## run the burn-in
-        nsteps = 50
+        nsteps = 1
         print 'running the burn in for {0:d} steps'.format(nsteps)
         start = timeit.default_timer()
         pos,prob,state = sampler.run_mcmc(inits,nsteps)   
@@ -131,7 +137,7 @@ if __name__ == '__main__':
     
         ## restart and run the sampling
         sampler.reset()
-        nsteps = 500
+        nsteps = 1
         print 'sampling for {0:d} steps'.format(nsteps)
         start = timeit.default_timer()
         sampler.run_mcmc(pos,nsteps)
@@ -146,19 +152,19 @@ if __name__ == '__main__':
         print xbest
         print 'creating outputs'
         bestparams = addFreePars(xbest,params,fixfree)
-        createOutputs_drz(bestparams,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,psf=psf,a=a,ps_s=ps_s)
+        #createOutputs_drz(bestparams,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,psf=psf,a=a,ps_s=ps_s)
         
         ## save outputs by pickling them
         print 'pickling sample chain'
         sys.setrecursionlimit(10000)
-        pickle.dump(sampler.chain,open('chain.p','wb'))
-        pickle.dump(sampler.flatchain,open('flatchain.p','wb'))
-        pickle.dump(sampler.lnprobability,open('lnprobability.p','wb'))
-        pickle.dump(sampler.flatlnprobability,open('flatlnprobability.p','wb')) 
-        #pickle.dump(sampler.blobs,open('blobs.p','wb'))
-        pickle.dump(labels,open('labels.p','wb'))
-        pickle.dump(bestparams,open('bestparams.p','wb'))
-        pickle.dump(fixfree,open('fixfree.p','wb'))
+        #pickle.dump(sampler.chain,open('chain.p','wb'))
+        #pickle.dump(sampler.flatchain,open('flatchain.p','wb'))
+        #pickle.dump(sampler.lnprobability,open('lnprobability.p','wb'))
+        #pickle.dump(sampler.flatlnprobability,open('flatlnprobability.p','wb')) 
+        ##pickle.dump(sampler.blobs,open('blobs.p','wb'))
+        #pickle.dump(labels,open('labels.p','wb'))
+        #pickle.dump(bestparams,open('bestparams.p','wb'))
+        #pickle.dump(fixfree,open('fixfree.p','wb'))
         #pickle.dump(sampler.acor,open('acor.p','wb'))
         #pickle.dump(sampler.acceptance_fraction,open('acceptance_fraction.p','rb'))
         print 'done.'
