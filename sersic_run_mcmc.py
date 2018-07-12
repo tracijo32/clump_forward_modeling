@@ -77,9 +77,9 @@ if __name__ == '__main__':
         inits = []
         for n in range(nwalkers):
             x = []
-            walker = np.zeros((nclumps,6))
+            walker = np.zeros((nclumps,7))
             for i in range(nclumps):
-                for j in range(6):
+                for j in range(7):
                     if fixfree[i,j] == 1:
                         walker[i,j] = np.random.uniform(low=priors[i,j,0],high=priors[i,j,1],size=1)
                     if fixfree[i,j] == 2:
@@ -122,13 +122,13 @@ if __name__ == '__main__':
                     }
     
         ## initiate the sampler
-        nthreads=2
+        nthreads = inputs.nthreads
         print str(datetime.now())
         print 'initiating MCMC ensemble sampler ({2:d} threads) with {0:d} walkers {1:d} free parameters'.format(nwalkers, ndim, nthreads)
         sampler = emcee.EnsembleSampler(nwalkers, ndim, logProb_image_drz, kwargs=fit_args, threads=nthreads)
     
         ## run the burn-in
-        nsteps = 1
+        nsteps = inputs.burnin
         print 'running the burn in for {0:d} steps'.format(nsteps)
         start = timeit.default_timer()
         pos,prob,state = sampler.run_mcmc(inits,nsteps)   
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     
         ## restart and run the sampling
         sampler.reset()
-        nsteps = 1
+        nsteps = inputs.sample
         print 'sampling for {0:d} steps'.format(nsteps)
         start = timeit.default_timer()
         sampler.run_mcmc(pos,nsteps)

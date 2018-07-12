@@ -710,6 +710,12 @@ class Inputs:
                 i+=1
                 continue
             ## load setup parameters
+            if ls[0] == 'nthreads':
+                self.nthreads = int(ls[1])
+            if ls[0] == 'burnin':
+                self.burnin = int(ls[1])
+            if ls[0] == 'sample':
+                self.sample = int(ls[1])
             if ls[0] == 'img_crop':
                 self.img_crop = np.array(ls[1:5]).astype(int)
             if ls[0] == 'deflect':
