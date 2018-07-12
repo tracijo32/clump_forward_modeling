@@ -152,21 +152,21 @@ if __name__ == '__main__':
         print xbest
         print 'creating outputs'
         bestparams = addFreePars(xbest,params,fixfree)
-        #createOutputs_drz(bestparams,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,psf=psf,a=a,ps_s=ps_s)
+        createOutputs_drz(bestparams,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,psf=psf,a=a,ps_s=ps_s)
         
         ## save outputs by pickling them
         print 'pickling sample chain'
         sys.setrecursionlimit(10000)
-        #pickle.dump(sampler.chain,open('chain.p','wb'))
-        #pickle.dump(sampler.flatchain,open('flatchain.p','wb'))
-        #pickle.dump(sampler.lnprobability,open('lnprobability.p','wb'))
-        #pickle.dump(sampler.flatlnprobability,open('flatlnprobability.p','wb')) 
-        ##pickle.dump(sampler.blobs,open('blobs.p','wb'))
-        #pickle.dump(labels,open('labels.p','wb'))
-        #pickle.dump(bestparams,open('bestparams.p','wb'))
-        #pickle.dump(fixfree,open('fixfree.p','wb'))
-        #pickle.dump(sampler.acor,open('acor.p','wb'))
-        #pickle.dump(sampler.acceptance_fraction,open('acceptance_fraction.p','rb'))
+        pickle.dump(sampler.chain,open('chain.p','wb'))
+        pickle.dump(sampler.flatchain,open('flatchain.p','wb'))
+        pickle.dump(sampler.lnprobability,open('lnprobability.p','wb'))
+        pickle.dump(sampler.flatlnprobability,open('flatlnprobability.p','wb')) 
+        #pickle.dump(sampler.blobs,open('blobs.p','wb'))
+        pickle.dump(labels,open('labels.p','wb'))
+        pickle.dump(bestparams,open('bestparams.p','wb'))
+        pickle.dump(fixfree,open('fixfree.p','wb'))
+        pickle.dump(sampler.acor,open('acor.p','wb'))
+        pickle.dump(sampler.acceptance_fraction,open('acceptance_fraction.p','rb'))
         print 'done.'
     else:
         createOutputs_drz(params,str='',data=data,xa=xa,ya=ya,xas=xas,yas=yas,dx=dx,dy=dy,
