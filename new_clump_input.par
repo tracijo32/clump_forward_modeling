@@ -1,12 +1,24 @@
-deflect     dplx2.fits dply2.fits
-ps          0.03
-rms         6.49
-kernel      1.38
-data        606.fits
-aperture    aperture.fits
-offset      778 1882
-resolution  10
-img_crop    1270 1340 2883 3080
+## lens model
+deflect     dplx2.fits dply2.fits       # deflection matrices at redshift of source
+ps          0.03                        # pixel scale of matrices & data
+
+## data
+rms         6.49                        # rms noise of data
+kernel      1.38                        # size of PSF in pixels
+data        606.fits                    # data to model
+aperture    aperture.fits               # aperture for pixels to ray trace
+offset      778 1882                    # x,y of first pixel of in deflection matrices
+                                        #   in reference to the data pixel grid
+                                        #   should be 0,0 if on the same grid
+resolution  10                          # ratio of image ps to source ps
+img_crop    1270 1340 2883 3080         # area to crop in the image plane to reconstruct
+
+## MCMC parameters
+nthreads    8                           # number of threads, -1 to use all available
+burnin      50                          # number of steps in the burn-in
+sample      500                         # number of steps in for sampling
+
+## clump parameters
 clump 1
     profile sersic
     x    1574.956
